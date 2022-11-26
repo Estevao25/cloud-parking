@@ -51,10 +51,11 @@ public class ParkingService {
 
 	public Parking update(String id, Parking parkingUpdate) {
 		Parking parking = findById(id);
-		parking.setColor(parkingUpdate.getColor());
-		parking.setState(parkingUpdate.getState());
-		parking.setModel(parkingUpdate.getModel());
-		parking.setLicense(parkingUpdate.getLicense());
+		
+		if(parkingUpdate.getColor() != null) {parking.setColor(parkingUpdate.getColor());}
+		if(parkingUpdate.getState() != null) {parking.setState(parkingUpdate.getState());}
+		if(parkingUpdate.getModel() != null) {parking.setModel(parkingUpdate.getModel());}
+		if(parkingUpdate.getLicense() != null) {parking.setLicense(parkingUpdate.getLicense());}
 		
 		parkingRepository.save(parking);
 		return parking;
