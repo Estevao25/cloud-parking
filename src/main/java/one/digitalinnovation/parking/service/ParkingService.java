@@ -21,7 +21,9 @@ public class ParkingService {
 		var id = getUUID();
 		var id1 = getUUID();
 		Parking parking = new Parking(id, "MSS-1111", "SC", "CELTA", "PRETO");
+		parking.setEntryDate(LocalDateTime.now());
 		Parking parking1 = new Parking(id1, "WAS-1234", "SP", "VW GOL", "VERMELHO");
+		parking1.setEntryDate(LocalDateTime.now());
 		parkingMap.put(id, parking);
 		parkingMap.put(id1, parking1);
 	}
@@ -49,5 +51,33 @@ public class ParkingService {
 		parkingMap.put(uuid, parkingCreate);
 		return parkingCreate;
 		
+	}
+
+	public void delete(String id) {
+		findById(id);
+		parkingMap.remove(id);
+		
+	}
+
+	public Parking update(String id, Parking parkingUpdate) {
+		Parking parking = findById(id);
+		parking.setColor(parkingUpdate.getColor());
+		parkingMap.replace(id, parking);
+		return parking;
+	}
+	
+	public Parking exit(String id) {
+		Parking parking = findById(id);
+		parking.setExitDate(LocalDateTime.now());
+		parkingMap.replace(id, parking);
+		
+		Integer horaInicio = parking.getEntryDate().getHour();
+		Integer horaFim = parking.getExitDate().getHour();;
+		
+		Double bill = ((Double.valueOf(horaFim) - Double.valueOf(horaInicio)) + 5) * 4.7;
+		
+		parking.setBill(bill);
+		
+		return parking;
 	}
 }
