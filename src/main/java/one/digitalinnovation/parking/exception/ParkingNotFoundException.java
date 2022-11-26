@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class ParkingNotFoundException extends RuntimeException {
 
 	public ParkingNotFoundException(String id) {
-		super("Parking not found with Id:" + id);
+		super("Parking not found with Id: " + id);
 	}
 	
 }
