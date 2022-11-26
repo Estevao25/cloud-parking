@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import one.digitalinnovation.parking.exception.ParkingNotFoundException;
 import one.digitalinnovation.parking.model.Parking;
@@ -19,19 +21,18 @@ public class ParkingService {
 		this.parkingRepository = parkingRepository;
 	}
 
+	@Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
 	public List<Parking> findAll() {
 		return parkingRepository.findAll();
 	}
-	
-	private static String getUUID() {
-		return UUID.randomUUID().toString().replace("-", "");
-	}
 
+	@Transactional(readOnly = true)
 	public Parking findById(String id) {
 		return parkingRepository.findById(id).orElseThrow(() -> 
 			new ParkingNotFoundException(id));
 	}
 
+	@Transactional
 	public Parking create(Parking parkingCreate) {
 		String uuid = getUUID();
 		parkingCreate.setId(uuid);
@@ -41,6 +42,7 @@ public class ParkingService {
 		
 	}
 
+	@Transactional
 	public void delete(String id) {
 		findById(id);
 		parkingRepository.deleteById(id);;
@@ -58,18 +60,17 @@ public class ParkingService {
 		return parking;
 	}
 	
-	public Parking exit(String id) {
+	@Transactional
+	public Parking checkOut(String id) {
 		Parking parking = findById(id);
-		parking.setExitDate(LocalDateTime.now());
-		
-		Integer horaInicio = parking.getEntryDate().getHour();
-		Integer horaFim = parking.getExitDate().getHour();;
-		
-		Double bill = ((Double.valueOf(horaFim) - Double.valueOf(horaInicio)) + 5) * 4.7;
-		
-		parking.setBill(bill);
+		parking.setExitDate(LocalDateTime.now());		
+		parking.setBill(ParkingCheckOut.getBill(parking));
+
 		parkingRepository.save(parking);
-		
 		return parking;
+	}
+	
+	private static String getUUID() {
+		return UUID.randomUUID().toString().replace("-", "");
 	}
 }
